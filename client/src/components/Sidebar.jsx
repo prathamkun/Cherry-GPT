@@ -9,10 +9,10 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   return (
     <div
-      className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b dark:from-[#242124]/30 dark:to-[#000000]/30 border-r border-[#80609F]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-1 ${!isMenuOpen && 'max-md:-translate-x-full'}`}
+      className={`flex flex-col h-screen min-w-72 p-5 dark:bg-gradient-to-b dark:from-[#242124]/30 dark:to-[#000000]/30 border-r border-[#EA7B7B]/30 backdrop-blur-3xl transition-all duration-500 max-md:absolute left-0 z-1 ${!isMenuOpen && 'max-md:-translate-x-full'}`}
     >
       <img
-        src={theme === 'dark' ? assets.logo_full : assets.logo_full_dark}
+        src={theme === 'dark' ? assets.logo_fullc : assets.logo_full_darkc}
         alt=''
         className='w-full max-w-48'
       />
@@ -44,7 +44,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
           .map((chat) => (
             <div onClick={()=> {navigate('/'); setSelectedChat(chat); setIsMenuOpen(false)}}
               key={chat._id}
-              className='p-2 px-4 dark:bg-[#57317C]/10 border border-gray-300 dark:border-[#80609F]/15 rounded-md cursor-pointer flex justify-between group'
+              className='p-2 px-4 dark:bg-[#9E3B3B]/10 border border-gray-300 dark:border-[#EA7B7B]/15 rounded-md cursor-pointer flex justify-between group'
             >
               <div>
                 <p className='truncate w-full'>
@@ -52,7 +52,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
                     ? chat.messages[0].content.slice(0, 32)
                     : chat.name}
                 </p>
-                <p className='text-xs text-gray-500 dark:text-[#B1A6C0]'>
+                <p className='text-xs text-gray-500 dark:text-[#FFEAD3]'>
                   {moment(chat.updatedAt).fromNow()}
                 </p>
               </div>
@@ -98,7 +98,7 @@ const Sidebar = ({ isMenuOpen, setIsMenuOpen }) => {
             className='sr-only peer'
             checked={theme === 'dark'}
           />
-          <div className='w-9 h-5 bg-gray-400 rounded-full peer-checked:bg-purple-600 transition-all'></div>
+          <div className='w-9 h-5 bg-gray-400 rounded-full peer-checked:bg-red-400 transition-all'></div>
           <span className='absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4'></span>
         </label>
       </div>

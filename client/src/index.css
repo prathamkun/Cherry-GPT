@@ -8,7 +8,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary: #E6CCFF;
+  --color-primary: #EA7B7B;
 }
 ::-webkit-scrollbar{
   display: none;

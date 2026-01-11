@@ -42,7 +42,7 @@ const ChatBox = () => {
         {messages.length === 0 && (
           <div className="h-full flex flex-col items-center justify-center gap-2 text-primary">
             <img
-              src={theme === 'dark' ? assets.logo_full : assets.logo_full_dark}
+              src={theme === 'dark' ? assets.logo_fullc : assets.logo_full_darkc}
               alt="CherryGPT Logo"
               className="w-full max-w-56 sm:max-w-68"
             />

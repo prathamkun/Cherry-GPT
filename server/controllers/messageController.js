@@ -1,73 +1,73 @@
-
-
-//Text-based AI Chat Message Controller
-
-import Chat from "../models/Chat.js"
-import User from "../models/User.js"
-
 export const textMessageController = async (req, res) => {
-    try {
-        const userId = req.user._id 
-        const {chatId, prompt} = req.body 
+  try {
+    const userId = req.user._id;
+    const { chatId, prompt } = req.body;
 
-        const chat = await Chat.findOne({userId, _id: chatId})
-        chat.messages.push({role: "user", content: prompt, timestamp: Date.now(), isImage: false})
-
-        const { choices } = await openai.chat.completions.create({
-        model: "gemini-2.5-flash",
-        messages: [
-        
-        {
-            role: "user",
-            content: prompt,
-        },
-    ],
-});
-
-    const reply = {...choices[0].message, timestamp: Date.now(), isImage: false}
-    res.json({success: true, reply})
-
-    chat.messages.push(reply)
-    await chat.save()
-    await User.updateOne({_id: userId}, {$inc: {credits: -1}})
-    
-        
-    } catch (error) {
-        res.json({success: false, message: error.message})
-        
+    if (!prompt) {
+      return res.status(400).json({
+        success: false,
+        message: "Prompt is required"
+      });
     }
-    
-}
 
-// Image Generation Message Controller
-export const imageMessageController = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        //check credits
-        if(req.user.credits < 2){
-            return res.json({success: false, message: "You don't have enough credits to use this feature"})
-        }
-        const {prompt, chatId, isPublished} = req.body
-        //find chat
-        const chat = await Chat.findOne({userId, _id: chatId})
-        // Push user message
-        chat.messages.push({role: "user", content: prompt, timestamp: Date.now(), isImage: false});
-
-        //Encode the prompt
-        const encodedPrompt = encodeURIComponent(prompt)
-
-        //Construct ImageKit AI generation URL
-        const generatedImageUrl = `${process.env.IMAGEKIT_URL_ENDPOINT}/
-        ik-genimg-prompt-${encodedPrompt}/cherrygpt/${Date.now()}.png?tr=w-800,h-800`;
-
-        //Trigger generation by fetching from Imagekit
-        const aiImageResponse =  await axios.get(generatedImageUrl, {responseType: "arraybuffer"})
-
-        //Convert to Base64
-        const base64Image = `data:image/png;base64,${Buffer.from(aiImageResponse.data, "binary").toString('base64')}`;
-
-        // Upload to ImageKit Media Library
-    } catch (error) {
-        
+    if (req.user.credits < 1) {
+      return res.status(403).json({
+        success: false,
+        message: "You don't have enough credits"
+      });
     }
-}
+
+    // 🔥 Find or create chat
+    let chat = null;
+
+    if (chatId) {
+      chat = await Chat.findOne({ _id: chatId, userId });
+    }
+
+    if (!chat) {
+      chat = await Chat.create({
+        userId,
+        messages: []
+      });
+    }
+
+    // Push user message
+    chat.messages.push({
+      role: "user",
+      content: prompt,
+      timestamp: Date.now(),
+      isImage: false
+    });
+
+    const { choices } = await openai.chat.completions.create({
+      model: "gemini-2.5-flash",
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    const reply = {
+      ...choices[0].message,
+      timestamp: Date.now(),
+      isImage: false
+    };
+
+    chat.messages.push(reply);
+
+    await chat.save();
+    await User.updateOne(
+      { _id: userId },
+      { $inc: { credits: -1 } }
+    );
+
+    return res.json({
+      success: true,
+      chatId: chat._id,
+      reply
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
